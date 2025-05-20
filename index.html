@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Portrait Order Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, textarea, select, button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+
+    #shippingDetails {
+      display: none;
+    }
+
+    #statusMsg {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Place Your Portrait Order</h2>
+
+  <form id="orderForm">
+    <label for="fullName">Full Name *</label>
+    <input type="text" id="fullName" name="fullName" required>
+
+    <label for="email">Email Address *</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="whatsapp">WhatsApp Number *</label>
+    <input type="tel" id="whatsapp" name="whatsapp" required>
+
+    <label for="faces">Number of Faces *</label>
+    <input type="number" id="faces" name="faces" required>
+
+    <label for="deliveryType">Delivery Type *</label>
+    <select id="deliveryType" name="deliveryType" required>
+      <option value="">--Choose an option--</option>
+      <option value="Digital">Digital</option>
+      <option value="Shipping">Shipping</option>
+    </select>
+
+    <div id="shippingDetails">
+      <label for="shippingAddress">Shipping Address *</label>
+      <textarea id="shippingAddress" name="shippingAddress"></textarea>
+    </div>
+
+    <label for="deliveryDate">Delivery Date *</label>
+    <input type="date" id="deliveryDate" name="deliveryDate" required>
+
+    <label for="photo">Upload Reference Photo *</label>
+    <input type="file" id="photo" name="photo" accept="image/*" required>
+
+    <label for="instructions">Additional Instructions</label>
+    <textarea id="instructions" name="instructions"></textarea>
+
+    <button type="submit">Submit Order</button>
+    <p id="statusMsg"></p>
+  </form>
+
+  <script>
+    const form = document.getElementById('orderForm');
+    const statusMsg = document.getElementById('statusMsg');
+    const deliveryType = document.getElementById('deliveryType');
+    const shippingDetails = document.getElementById('shippingDetails');
+
+    deliveryType.addEventListener('change', () => {
+      shippingDetails.style.display = deliveryType.value === 'Shipping' ? 'block' : 'none';
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+
+      fetch('https://script.google.com/macros/library/d/1m_gHyvhVz5Z67Q5cslLZb3VzoJIn35eyHSsD_TmA7lUI3os0cCycZjkO/3', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result === 'success') {
+          statusMsg.textContent = '✅ Order submitted successfully!';
+          form.reset();
+          shippingDetails.style.display = 'none';
+        } else {
+          statusMsg.textContent = '❌ Submission failed. Error: ' + data.message;
+          console.error(data.message);
+        }
+      })
+      .catch(error => {
+        console.error('Error!', error);
+        statusMsg.textContent = '❌ Submission failed. Please try again.';
+      });
+    });
+  </script>
+</body>
+</html>
